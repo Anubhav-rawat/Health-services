@@ -1,25 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import ServiceList from "./components/ServiceList";
+import AddServiceForm from "./components/AddServiceForm";
+import UpdateServiceForm from "./components/UpdateServiceForm";
+import "./styles/App.css";
 
-function App() {
+const App = () => {
+  const [services, setServices] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentServiceIndex, setCurrentServiceIndex] = useState(null);
+
+  const addService = (service) => {
+    setServices([...services, service]);
+  };
+
+  const deleteService = (index) => {
+    setServices(services.filter((_, i) => i !== index));
+  };
+
+  const handleEdit = (index) => {
+    setIsEditing(true);
+    setCurrentServiceIndex(index);
+  };
+
+  const updateService = (updatedService) => {
+    const updatedServices = services.map((service, i) =>
+      i === currentServiceIndex ? updatedService : service
+    );
+    setServices(updatedServices);
+    setIsEditing(false);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app-container">
+      {!isEditing ? (
+        <AddServiceForm addService={addService} />
+      ) : (
+        <UpdateServiceForm
+          serviceToEdit={services[currentServiceIndex]}
+          updateService={updateService}
+          cancelEdit={cancelEdit}
+        />
+      )}
+      <ServiceList
+        services={services}
+        handleDelete={deleteService}
+        handleEdit={handleEdit}
+      />
     </div>
   );
-}
+};
 
 export default App;
